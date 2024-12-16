@@ -1,16 +1,26 @@
-from typing import Union
-
 from fastapi import FastAPI
-from pydantic import BaseModel
+from sqlmodel import SQLModel, create_engine
+from aaa_repo.responsemodels.customer import CustomerModel
+from aaa_repo.responsemodels.customer import CreateCustomerModel
+from aaa_repo.database.customer_table import Customer
+from aaa_repo.database.breakdown_table import Breakdown
+
 
 app = FastAPI()
 
-class Customer(BaseModel):
+engine = create_engine(
+    "sqlite:///aaa.db",
+    connect_args={"check_same_thread": False},  # Needed for SQLite
+    echo=True  # Log generated SQL
+)
+
+@app.on_event("startup")
+def on_startup():
     """
-    Customer Class
+    Create tables
     """
-    name: str
-    is_premium_member: Union[bool, None] = None
+    SQLModel.metadata.create_all(engine)
+
 
 
 @app.get("/")
@@ -18,11 +28,11 @@ def read_root():
     """
     Read Root
     """
-    return {"Hello": "This is AAA"}
+    return {"Hello": "This is your trusty AAA app"}
 
 
 @app.get("/customer/{customer_id}")
-def read_customer(customer_id: int, name: Union[str, None] = None):
+def read_customer(customer_id: int, name: str | None = None):
     """
     Read Customer
     """
@@ -30,7 +40,7 @@ def read_customer(customer_id: int, name: Union[str, None] = None):
 
 
 @app.put("/customer/{customer_id}")
-def update_customer(customer_id: int, customer: Customer):
+def update_customer(customer_id: int, customer: CustomerModel):
     """
     Update Customer
     """
