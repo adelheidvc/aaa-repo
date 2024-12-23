@@ -1,4 +1,10 @@
-from sqlmodel import create_engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase
+
+class SQLiteBase(DeclarativeBase):
+    """
+    Base class for ORM
+    """
 
 engine = create_engine(
     "sqlite:///aaa.db",

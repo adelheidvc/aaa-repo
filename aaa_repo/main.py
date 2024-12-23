@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from sqlmodel import SQLModel, create_engine
+from aaa_repo.database.db import SQLiteBase
+from aaa_repo.database.db import engine
 from aaa_repo.responsemodels.customer import CustomerModel
 from aaa_repo.responsemodels.customer import CreateCustomerModel
 from aaa_repo.database.customer_table import Customer
@@ -8,18 +9,12 @@ from aaa_repo.database.breakdown_table import Breakdown
 
 app = FastAPI()
 
-engine = create_engine(
-    "sqlite:///aaa.db",
-    connect_args={"check_same_thread": False},  # Needed for SQLite
-    echo=True  # Log generated SQL
-)
-
 @app.on_event("startup")
 def on_startup():
     """
     Create tables
     """
-    SQLModel.metadata.create_all(engine)
+    SQLiteBase.metadata.create_all(engine)
 
 
 
