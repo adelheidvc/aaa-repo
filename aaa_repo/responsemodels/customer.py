@@ -5,6 +5,7 @@ class CustomerModel(BaseModel):
     """
     Customer Class
     """
+
     name: str
     car_model: str | None = None
     license_number: str | None = None
@@ -15,6 +16,7 @@ class CreateCustomerModel(BaseModel):
     """
     CreateCustomer Class including id
     """
+
     id: int
     name: str
     car_model: str

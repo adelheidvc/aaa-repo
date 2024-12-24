@@ -9,13 +9,13 @@ from aaa_repo.database.breakdown_table import Breakdown
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 def on_startup():
     """
     Create tables
     """
     SQLiteBase.metadata.create_all(engine)
-
 
 
 @app.get("/")
@@ -39,4 +39,8 @@ def update_customer(customer_id: int, customer: CustomerModel):
     """
     Update Customer
     """
-    return {"customer_id": customer_id, "customer_name": customer.name, "premium_member": customer.is_premium_member}
+    return {
+        "customer_id": customer_id,
+        "customer_name": customer.name,
+        "premium_member": customer.is_premium_member,
+    }
