@@ -1,5 +1,5 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from sqlalchemy import select
 from aaa_repo.database.db import SQLiteBase
 from aaa_repo.database.db import engine
 from aaa_repo.database.db import DatabaseSession
@@ -9,15 +9,17 @@ from aaa_repo.database.customer_table import Customer
 from aaa_repo.database.breakdown_table import Breakdown
 
 
-app = FastAPI()
-
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
     Create tables
     """
     SQLiteBase.metadata.create_all(engine)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
 
 
 @app.get("/")
