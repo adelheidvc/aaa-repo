@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from aaa_repo.database.db import SQLiteBase
 from aaa_repo.database.db import engine
 from aaa_repo.database.db import DatabaseSession
@@ -19,7 +19,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
 
 
 @app.get("/")
@@ -47,16 +46,23 @@ def read_customer(customer_id: int, db: DatabaseSession):
     return customer
 
 
-@app.put("/customer/{customer_id}")
-def update_customer(customer_id: int, customer: CustomerModel):
+@app.put("/customer/{customer_id}", response_model=CustomerModel)
+def update_customer(
+    customer_id: int, updated_customer: CreateCustomerModel, db: DatabaseSession
+):
     """
     Update Customer
     """
-    return {
-        "customer_id": customer_id,
-        "customer_name": customer.name,
-        "premium_member": customer.is_premium_member,
-    }
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    customer.name = updated_customer.name
+    customer.car_model = updated_customer.car_model
+    customer.license_number = updated_customer.license_number
+    customer.is_premium_member = updated_customer.is_premium_member
+    db.commit()
+    db.refresh(customer)
+    return customer
 
 
 @app.post("/customer/", response_model=CustomerModel)
