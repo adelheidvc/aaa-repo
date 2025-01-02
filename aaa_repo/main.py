@@ -129,7 +129,7 @@ def update_customer(
     """
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if customer is None:
-        raise HTTPException(status_code=404, detail="Customer not found")
+        raise HTTPException(status_code=404, detail="Customer to be updated not found")
     customer.name = updated_customer.name
     customer.car_model = updated_customer.car_model
     customer.license_number = updated_customer.license_number
@@ -150,7 +150,7 @@ def update_breakdown(
         db.query(Breakdown).filter(Breakdown.breakdown_id == breakdown_id).first()
     )
     if breakdown is None:
-        raise HTTPException(status_code=404, detail="breakdown not found")
+        raise HTTPException(status_code=404, detail="Breakdown to be updated not found")
     breakdown.customer_id = updated_breakdown.customer_id
     breakdown.moment_of_breakdown = updated_breakdown.moment_of_breakdown
     breakdown.description = updated_breakdown.description
@@ -168,7 +168,7 @@ def partial_update_customer(
     """
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if customer is None:
-        raise HTTPException(status_code=404, detail="Customer not found")
+        raise HTTPException(status_code=404, detail="Customer to be patched not found")
     updated_data = updated_customer.model_dump(exclude_unset=True)
     for key, value in updated_data.items():
         setattr(customer, key, value)
@@ -188,7 +188,7 @@ def partial_update_breakdown(
         db.query(Breakdown).filter(Breakdown.breakdown_id == breakdown_id).first()
     )
     if breakdown is None:
-        raise HTTPException(status_code=404, detail="Breakdown not found")
+        raise HTTPException(status_code=404, detail="Breakdown to be patched not found")
     updated_data = updated_breakdown.model_dump(exclude_unset=True)
     for key, value in updated_data.items():
         setattr(breakdown, key, value)
