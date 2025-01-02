@@ -50,6 +50,8 @@ def read_customer(customer_id: int, db: DatabaseSession):
     Read Customer
     """
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
     return customer
 
 @app.get("/breakdown/{breakdown_id}", response_model=BreakdownModel)
@@ -58,6 +60,8 @@ def read_breakdown(breakdown_id: int, db: DatabaseSession):
     Read Breakdown
     """
     breakdown = db.query(Breakdown).filter(Breakdown.breakdown_id == breakdown_id).first()
+    if breakdown is None:
+        raise HTTPException(status_code=404, detail="Breakdown not found")
     return breakdown
 
 
@@ -108,6 +112,9 @@ def create_customer(customer: CreateCustomerModel, db: DatabaseSession):
         license_number=customer.license_number,
         is_premium_member=customer.is_premium_member,
     )
+    db_customer = db.query(Customer).filter(Customer.license_number == new_customer.license_number).first()
+    if db_customer and db_customer.license_number != "":
+        raise HTTPException(status_code=409, detail=f"License_number already exists for customer {db_customer.name} with id {db_customer.id}")
     db.add(new_customer)
     db.commit()
     db.refresh(new_customer)
