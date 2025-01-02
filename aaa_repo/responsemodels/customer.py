@@ -22,3 +22,14 @@ class CreateCustomerModel(BaseModel):
     car_model: str
     license_number: str
     is_premium_member: bool = False
+
+
+class PatchCustomerModel(BaseModel):
+    """
+    PatchCustomer Class
+    """
+
+    name: str | None = None
+    car_model: str | None = None
+    license_number: str | None = None
+    is_premium_member: bool | None = None
