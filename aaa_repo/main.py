@@ -79,6 +79,23 @@ def update_customer(
     db.refresh(customer)
     return customer
 
+@app.put("/breakdown/{breakdown_id}", response_model=BreakdownModel)
+def update_breakdown(
+    breakdown_id: int, updated_breakdown: CreateBreakdownModel, db: DatabaseSession
+):
+    """
+    Update Breakdown
+    """
+    breakdown = db.query(Breakdown).filter(Breakdown.breakdown_id == breakdown_id).first()
+    if breakdown is None:
+        raise HTTPException(status_code=404, detail="breakdown not found")
+    breakdown.customer_id = updated_breakdown.customer_id
+    breakdown.moment_of_breakdown = updated_breakdown.moment_of_breakdown
+    breakdown.description = updated_breakdown.description
+    db.commit()
+    db.refresh(breakdown)
+    return breakdown
+
 
 @app.post("/customer/", response_model=CustomerModel)
 def create_customer(customer: CreateCustomerModel, db: DatabaseSession):
