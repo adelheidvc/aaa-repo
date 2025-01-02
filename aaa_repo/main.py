@@ -3,10 +3,10 @@ from fastapi import FastAPI, HTTPException
 from aaa_repo.database.db import SQLiteBase
 from aaa_repo.database.db import engine
 from aaa_repo.database.db import DatabaseSession
-from aaa_repo.responsemodels.customer import CustomerModel
-from aaa_repo.responsemodels.customer import CreateCustomerModel
+from aaa_repo.responsemodels.customer import CustomerModel, CreateCustomerModel
 from aaa_repo.database.customer_table import Customer
 from aaa_repo.database.breakdown_table import Breakdown
+from aaa_repo.responsemodels.breakdown import BreakdownModel, CreateBreakdownModel
 
 
 @asynccontextmanager
@@ -36,6 +36,13 @@ def list_customer(db: DatabaseSession):
     """
     return db.query(Customer).all()
 
+@app.get("/breakdown/", response_model=list[BreakdownModel])
+def list_breakdown(db: DatabaseSession):
+    """
+    List all Breakdowns
+    """
+    return db.query(Breakdown).all()
+
 
 @app.get("/customer/{customer_id}", response_model=CustomerModel)
 def read_customer(customer_id: int, db: DatabaseSession):
@@ -44,6 +51,14 @@ def read_customer(customer_id: int, db: DatabaseSession):
     """
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     return customer
+
+@app.get("/breakdown/{breakdown_id}", response_model=BreakdownModel)
+def read_breakdown(breakdown_id: int, db: DatabaseSession):
+    """
+    Read Breakdown
+    """
+    breakdown = db.query(Breakdown).filter(Breakdown.breakdown_id == breakdown_id).first()
+    return breakdown
 
 
 @app.put("/customer/{customer_id}", response_model=CustomerModel)
@@ -80,3 +95,18 @@ def create_customer(customer: CreateCustomerModel, db: DatabaseSession):
     db.commit()
     db.refresh(new_customer)
     return new_customer
+
+@app.post("/breakdown/", response_model=BreakdownModel)
+def create_breakdown(breakdown: CreateBreakdownModel, db: DatabaseSession):
+    """
+    Create Breakdown
+    """
+    new_breakdown = Breakdown(
+        customer_id=breakdown.customer_id,
+        moment_of_breakdown=breakdown.moment_of_breakdown,
+        description=breakdown.description,
+    )
+    db.add(new_breakdown)
+    db.commit()
+    db.refresh(new_breakdown)
+    return new_breakdown

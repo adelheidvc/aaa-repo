@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class CustomerModel(BaseModel):
     """
-    Customer Class
+    Customer Class including id
     """
 
     id: int
@@ -15,7 +15,7 @@ class CustomerModel(BaseModel):
 
 class CreateCustomerModel(BaseModel):
     """
-    CreateCustomer Class including id
+    CreateCustomer Class
     """
 
     name: str
