@@ -1,4 +1,6 @@
+import sys
 from contextlib import asynccontextmanager
+from pydantic import ValidationError
 from fastapi import FastAPI, HTTPException
 from aaa_repo.database.db import SQLiteBase
 from aaa_repo.database.db import engine
@@ -168,10 +170,14 @@ def partial_update_customer(
     """
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if customer is None:
-        raise HTTPException(status_code=404, detail="Customer to be patched not found")
+        raise HTTPException(status_code=404, detail="Customer to be patched not found")    
     updated_data = updated_customer.model_dump(exclude_unset=True)
-    for key, value in updated_data.items():
-        setattr(customer, key, value)
+    try:
+        PatchCustomerModel.model_validate(updated_customer)
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    for key, value in updated_data.items(): 
+        setattr(customer, key, value)    
     db.commit()
     db.refresh(customer)
     return customer

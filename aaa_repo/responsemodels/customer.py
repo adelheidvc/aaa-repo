@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CustomerModel(BaseModel):
@@ -28,6 +28,8 @@ class PatchCustomerModel(BaseModel):
     """
     PatchCustomer Class
     """
+
+    model_config = ConfigDict(extra='forbid')
 
     name: str | None = None
     car_model: str | None = None
