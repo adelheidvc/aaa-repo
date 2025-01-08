@@ -28,10 +28,10 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title='AAA', lifespan=lifespan)
 
 
-@app.get("/")
+@app.get("/", tags=["AAA"])
 def read_root():
     """
     Read Root
@@ -39,7 +39,7 @@ def read_root():
     return {"Hello": "This is your trusty AAA app"}
 
 
-@app.get("/customer/", response_model=list[CustomerModel])
+@app.get("/customer/", tags=["Get Customer List "], response_model=list[CustomerModel])
 def list_customer(db: DatabaseSession):
     """
     List all Customers
@@ -47,7 +47,7 @@ def list_customer(db: DatabaseSession):
     return db.query(Customer).all()
 
 
-@app.get("/breakdown/", response_model=list[BreakdownModel])
+@app.get("/breakdown/", tags=["Get Breakdown List"], response_model=list[BreakdownModel])
 def list_breakdown(db: DatabaseSession):
     """
     List all Breakdowns
@@ -55,7 +55,7 @@ def list_breakdown(db: DatabaseSession):
     return db.query(Breakdown).all()
 
 
-@app.get("/customer/{customer_id}", response_model=CustomerModel)
+@app.get("/customer/{customer_id}", tags=["Get Customer by ID"], response_model=CustomerModel)
 def read_customer(customer_id: int, db: DatabaseSession):
     """
     Read Customer
@@ -66,7 +66,7 @@ def read_customer(customer_id: int, db: DatabaseSession):
     return customer
 
 
-@app.get("/breakdown/{breakdown_id}", response_model=BreakdownModel)
+@app.get("/breakdown/{breakdown_id}", tags=["Get Breakdown by ID"], response_model=BreakdownModel)
 def read_breakdown(breakdown_id: int, db: DatabaseSession):
     """
     Read Breakdown
@@ -79,7 +79,7 @@ def read_breakdown(breakdown_id: int, db: DatabaseSession):
     return breakdown
 
 
-@app.post("/customer/", response_model=CustomerModel)
+@app.post("/customer/", tags=["Create Customer"], response_model=CustomerModel)
 def create_customer(customer: CreateCustomerModel, db: DatabaseSession):
     """
     Create Customer
@@ -106,7 +106,7 @@ def create_customer(customer: CreateCustomerModel, db: DatabaseSession):
     return new_customer
 
 
-@app.post("/breakdown/", response_model=BreakdownModel)
+@app.post("/breakdown/", tags=["Create Breakdown"], response_model=BreakdownModel)
 def create_breakdown(breakdown: CreateBreakdownModel, db: DatabaseSession):
     """
     Create Breakdown
@@ -122,7 +122,7 @@ def create_breakdown(breakdown: CreateBreakdownModel, db: DatabaseSession):
     return new_breakdown
 
 
-@app.put("/customer/{customer_id}", response_model=CustomerModel)
+@app.put("/customer/{customer_id}", tags=["Update of Customer"], response_model=CustomerModel)
 def update_customer(
     customer_id: int, updated_customer: CreateCustomerModel, db: DatabaseSession
 ):
@@ -141,7 +141,7 @@ def update_customer(
     return customer
 
 
-@app.put("/breakdown/{breakdown_id}", response_model=BreakdownModel)
+@app.put("/breakdown/{breakdown_id}", tags=["Update of Breakdown"], response_model=BreakdownModel)
 def update_breakdown(
     breakdown_id: int, updated_breakdown: CreateBreakdownModel, db: DatabaseSession
 ):
@@ -161,7 +161,7 @@ def update_breakdown(
     return breakdown
 
 
-@app.patch("/customer/{customer_id}", response_model=CustomerModel)
+@app.patch("/customer/{customer_id}", tags=["Partial Update of Customer"], response_model=CustomerModel)
 def partial_update_customer(
     customer_id: int, updated_customer: PatchCustomerModel, db: DatabaseSession
 ):
@@ -175,7 +175,7 @@ def partial_update_customer(
     try:
         PatchCustomerModel.model_validate(updated_customer)
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+        raise HTTPException(status_code=400, detail="Field to be patched not found") from e
     for key, value in updated_data.items(): 
         setattr(customer, key, value)    
     db.commit()
@@ -183,7 +183,7 @@ def partial_update_customer(
     return customer
 
 
-@app.patch("/breakdown/{breakdown_id}", response_model=BreakdownModel)
+@app.patch("/breakdown/{breakdown_id}", tags=["Partial Update of Breakdown"], response_model=BreakdownModel)
 def partial_update_breakdown(
     breakdown_id: int, updated_breakdown: PatchBreakdownModel, db: DatabaseSession
 ):
